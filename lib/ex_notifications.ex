@@ -16,7 +16,7 @@ defmodule ExNotifications do
   @doc """
   Returns the queued notification object
   """
-  @spec get_notification_id(String.t()) :: map()
+  @spec get_notification_id(binary()) :: map()
   def get_notification_id(notification_id) do
     GeeksHelpers.endpoint_get_callback(
       "#{Helpers.endpoint()}/api/v1/project/#{Helpers.project_id()}/notification/#{notification_id}",
@@ -46,15 +46,16 @@ defmodule ExNotifications do
   @spec check_channels() :: boolean() | {:error, any()}
   def check_channels do
     case GeeksHelpers.endpoint_get_callback(
-      "#{Helpers.endpoint()}/api/v1/project/#{Helpers.project_id()}/channels",
-      Helpers.header()
-    ) do
+           "#{Helpers.endpoint()}/api/v1/project/#{Helpers.project_id()}/channels",
+           Helpers.header()
+         ) do
       %{} = data ->
         if Helpers.check_channels(data) do
           Logger.info("Your ExNotifications channels are correctly configured")
         else
           Logger.error("Fix your ExNotifications channels configuration")
         end
+
       {:error, resp} ->
         Logger.error("ExNotifications misconfiguration: #{resp}")
         {:error, resp}
@@ -68,7 +69,7 @@ defmodule ExNotifications do
 
   Returns a list of maps to use in the `channels` field of the `send/1` function
   """
-  @spec build_channels(String.t(), list(), integer(), map()) :: list()
+  @spec build_channels(binary(), list(), integer(), map()) :: list()
   def build_channels(type, to, template_id, tokens)
 
   def build_channels("push_web", to, template_id, tokens) when is_list(to) do
@@ -125,7 +126,7 @@ defmodule ExNotifications do
 
   Returns a list of channels with one channel to use in the `send/1` function
   """
-  @spec build_channels(String.t(), String.t(), map(), String.t(), String.t() | none()) :: list()
+  @spec build_channels(binary(), binary(), map(), binary(), binary() | none()) :: list()
   def build_channels("email", subject, body, to, from \\ Helpers.sender_email_address()) do
     [
       %{
@@ -211,11 +212,12 @@ defmodule ExNotifications do
 
   For more information refer to the [API docs](https://notifications.geeks.solutions/docs/frontend/index.html#2-sending-notifications)
   """
-  @spec send(map()) :: {:ok, map()} | {:error, map()}
+  @spec send(map()) :: {:ok, list()} | {:error, map()}
   def send(body) do
     case GeeksHelpers.endpoint_post_callback(send_notification_url(), body, Helpers.header()) do
       %{"invalid_notifications" => [], "valid_jobs" => [_valid_job] = valid_jobs} ->
         {:ok, valid_jobs}
+
       %{"invalid_notifications" => [_invalid_jobs]} = resp ->
         {:error, resp}
     end
@@ -226,7 +228,7 @@ defmodule ExNotifications do
 
   Returns a tuple similar to `send/1`
   """
-  @spec send(String.t(), map()) :: {:ok, map()} | {:error, map()}
+  @spec send(binary(), map()) :: {:ok, list()} | {:error, map()}
   def send("webhook", content) do
     build_body("webhook", content)
     |> send()
@@ -239,7 +241,7 @@ defmodule ExNotifications do
 
   Returns a tuple similar to `send/1`
   """
-  @spec send(String.t(), map(), map() | String.t()) :: {:ok, map()} | {:error, map()}
+  @spec send(binary(), map(), map() | binary()) :: {:ok, list()} | {:error, map()}
   def send(type, content, to) do
     build_body(type, content, to)
     |> send()
@@ -250,7 +252,7 @@ defmodule ExNotifications do
 
   Response is similar to `send/1`
   """
-  @spec send(String.t(), String.t(), map(), String.t(), String.t()) :: {:ok, map()} | {:error, map()}
+  @spec send(binary(), binary(), map(), binary(), binary()) :: {:ok, list()} | {:error, map()}
   def send("email", subject, body, to, from \\ Helpers.sender_email_address()) do
     body = build_channels("email", subject, body, to, from)
 

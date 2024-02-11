@@ -68,35 +68,48 @@ defmodule ExNotifications.Helpers do
       "apns" ->
         Map.get(configured_channels, "apns")
         |> check_channel(apns_channel())
+
       "email" ->
         Map.get(configured_channels, "email")
         |> check_channel(email_channel())
+
       "fcm" ->
         Map.get(configured_channels, "fcm")
         |> check_channel(fcm_channel())
+
       "push" ->
         Map.get(configured_channels, "push")
         |> check_channel(web_push_channel())
+
       "webhook" ->
         Map.get(configured_channels, "webhook")
         |> check_channel(webhook_channel())
+
       _any ->
         true
     end)
   end
 
-  defp check_channel(configured_channel, local_config) when is_binary(local_config) and is_map(configured_channel) do
+  defp check_channel(configured_channel, local_config)
+       when is_binary(local_config) and is_map(configured_channel) do
     if Map.has_key?(configured_channel, local_config) do
       true
     else
-      Logger.error("ExNotifications: #{local_config} is not configured on your Notifications project")
+      Logger.error(
+        "ExNotifications: #{local_config} is not configured on your Notifications project"
+      )
+
       false
     end
   end
 
   defp check_channel(_, local_config) when is_nil(local_config), do: true
+
   defp check_channel(_, local_config) do
-    Logger.error("ExNotifications: #{local_config} is not configured on your Notifications project")
+    Logger.error(
+      "ExNotifications: #{local_config} is not configured on your Notifications project"
+    )
+
     false
   end
 end

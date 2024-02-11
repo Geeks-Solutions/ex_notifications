@@ -26,4 +26,4 @@ ex_notifications-*.tar
 /tmp/
 
 #Elixir LS
-.elixir_ls/
+/.elixir_ls/

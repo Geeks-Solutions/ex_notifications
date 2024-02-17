@@ -27,6 +27,16 @@ def deps do
 end
 ```
 
+If you want to benefit from a verification routine on your application start, you can add the following children to your start/2 callback of your Application.ex
+
+```elixir
+  {Task,
+    fn ->
+      # Check ExNotifications is correctly configured
+      ExNotifications.check_channels()
+  end}
+```
+
 ## Configuration
 
 You need to provide a set of configurations for ex_notifications to run correctly, in your config.exs (or {env}.exs)

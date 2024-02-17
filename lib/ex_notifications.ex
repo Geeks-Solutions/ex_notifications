@@ -141,7 +141,7 @@ defmodule ExNotifications do
           from: from
         },
         content: %{
-          html_body: body,
+          html_body: body.html,
           subject: subject
         },
         recipients: to
@@ -250,10 +250,12 @@ defmodule ExNotifications do
   @doc """
   Sends an `email`
 
+  The body is a map with at least the `html` key and optionally the `text` key
+
   Response is similar to `send/1`
   """
   @spec send(binary(), binary(), map(), binary(), binary()) :: {:ok, list()} | {:error, map()}
-  def send("email", subject, body, to, from \\ Helpers.sender_email_address()) do
+  def send("email", subject, %{html: _} = body, to, from \\ Helpers.sender_email_address()) do
     body = build_channels("email", subject, body, to, from)
 
     send(%{channels: body})

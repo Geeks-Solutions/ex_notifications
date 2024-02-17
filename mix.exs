@@ -38,7 +38,7 @@ defmodule ExNotifications.MixProject do
       {:excoveralls, "~> 0.10", only: :test},
       {:ex_geeks,
        git: "https://github.com/Geeks-Solutions/ex_geeks",
-       ref: "a591f05fb7b37618590bf76bf45057d9780fa2c4"}
+       ref: "cde9b4e89f14c992d19e9aa52273aa5e0aab92e6"}
     ]
   end
 end

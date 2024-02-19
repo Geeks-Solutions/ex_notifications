@@ -215,7 +215,7 @@ defmodule ExNotifications do
   @spec send(map()) :: {:ok, list()} | {:error, map()}
   def send(body) do
     case GeeksHelpers.endpoint_post_callback(send_notification_url(), body, Helpers.header()) do
-      %{"invalid_notifications" => [], "valid_jobs" => [_valid_job] = valid_jobs} ->
+      %{"invalid_notifications" => [], "valid_jobs" => valid_jobs} when is_list(valid_jobs) ->
         {:ok, valid_jobs}
 
       %{"invalid_notifications" => [_invalid_jobs]} = resp ->
@@ -238,6 +238,17 @@ defmodule ExNotifications do
   Sends a `push_web`, `APNS` or `FCM` notification:
 
   Provided a type, a content and a recipient
+
+  for `push_web` the recipient should be a map or a list of maps, each map should be in the following format:
+  ```elixir
+  %{
+    "endpoint" => "",
+    "keys" => %{
+      "auth" => "",
+      "p256dh" => ""
+    }
+  }
+  ```
 
   Returns a tuple similar to `send/1`
   """
@@ -270,6 +281,20 @@ defmodule ExNotifications do
           payload: content
         }
       ]
+    }
+  end
+
+  defp build_body("push_web", content, to) when is_list(to) do
+    %{
+      channels:
+        Enum.map(to, fn endpoint ->
+          %{
+            type: "push",
+            name: Helpers.web_push_channel(),
+            content: content,
+            subscription: endpoint
+          }
+        end)
     }
   end
 

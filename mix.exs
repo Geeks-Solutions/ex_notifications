@@ -39,7 +39,7 @@ defmodule ExNotifications.MixProject do
       # {:ex_geeks, path: "/Users/julien/Documents/Repos/Gitlab/Geeks/Libraries/ex_geeks"}
       {:ex_geeks,
        git: "https://github.com/Geeks-Solutions/ex_geeks",
-       ref: "749f6d0b4acac38ddc6c34300031fa765063f4d3"}
+       ref: "1e2db418156840abf6ad947ab5d60be1549f0708"}
     ]
   end
 end

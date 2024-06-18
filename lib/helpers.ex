@@ -55,6 +55,10 @@ defmodule ExNotifications.Helpers do
     env(:webhook_channel, %{raise: false})
   end
 
+  def telegram_channel do
+    env(:telegram_channel, %{raise: false})
+  end
+
   def header do
     [
       pkey: private_key(),

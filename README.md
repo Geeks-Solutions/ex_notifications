@@ -13,6 +13,7 @@ The SaaS Application can support various notification types:
 - Mobile Push (iOs and Android)
 - Web Push
 - SMS
+- Telegram
 
 ## Installation
 
@@ -62,6 +63,7 @@ The following configs are optional, but may be required by your own application 
 - `apns_channel`: The name of the channel you configured on your Notifications project to relay APNS push notifications
 - `web_push_channel`: The name of the channel you configured on your Notifications project to relay Web push notifications
 - `webhook_channel`: The name of the channel you configured on your Notifications project to relay webhooks
+- `telegram_channel`: The name of the channel you configured on your Notifications project to relay telegram messages
 
 ### Dev config
 For development purpose you can also use the following config:

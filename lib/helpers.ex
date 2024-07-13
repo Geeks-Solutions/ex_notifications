@@ -89,6 +89,10 @@ defmodule ExNotifications.Helpers do
         Map.get(configured_channels, "webhook")
         |> check_channel(webhook_channel())
 
+      "telegram" ->
+        Map.get(configured_channels, "telegram")
+        |> check_channel(telegram_channel())
+
       _any ->
         true
     end)

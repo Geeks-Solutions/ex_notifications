@@ -186,31 +186,46 @@ defmodule ExNotifications do
 
   This version does not rely on the template
 
-  Needs the type (ie email), `subject`, `body`, `to` and an option `from`
+  Needs the type (ie email), `subject`, `body`, `to` and a list of options `opts`
+
+  `to` can be a single email or a list of emails
+  supported `opts` are:
+  - `from`: required to set the sender
+  - `separate`: optional, used to separate each recipient into its own email
 
   Returns a list of channels with one channel to use in the `send/1` function
   """
-  @spec build_channels(binary(), binary(), map(), binary(), binary() | none()) :: list()
-  def build_channels("email", subject, body, to, from \\ Helpers.sender_email_address()) do
-    [
-      %{
-        type: "email",
-        config: %{
-          relays: [
-            %{
-              weight: 0,
-              relay: Helpers.email_channel()
-            }
-          ],
-          from: from
-        },
-        content: %{
-          html_body: body.html,
-          subject: subject
-        },
-        recipients: to
-      }
-    ]
+  @spec build_channels(binary(), binary(), map(), binary() | list(), list()) :: list()
+  def build_channels("email", subject, body, to, opts) do
+    if is_list(to) && opts[:separate] do
+      Enum.map(to, fn recipient ->
+        email_channel_obj(subject, body, recipient, opts[:from])
+      end)
+    else
+      [
+        email_channel_obj(subject, body, to, opts[:from])
+      ]
+    end
+  end
+
+  defp email_channel_obj(subject, body, to, from) do
+    %{
+      type: "email",
+      config: %{
+        relays: [
+          %{
+            weight: 0,
+            relay: Helpers.email_channel()
+          }
+        ],
+        from: from
+      },
+      content: %{
+        html_body: body.html,
+        subject: subject
+      },
+      recipients: to
+    }
   end
 
   @doc """
@@ -334,12 +349,19 @@ defmodule ExNotifications do
   Sends an `email`
 
   The body is a map with at least the `html` key and optionally the `text` key
+  supported `opts` are
+  - `from`: to specify a sender, otherwise the sender_email_address will be used
+  - `separate`: to indicate if each email should be sent separately when a list of `to` is provided
 
   Response is similar to `send/1`
   """
-  @spec send(binary(), binary(), map(), binary(), binary()) :: {:ok, list()} | {:error, map()}
-  def send("email", subject, %{html: _} = body, to, from \\ Helpers.sender_email_address()) do
-    body = build_channels("email", subject, body, to, from)
+  @spec send(binary(), binary(), map(), binary() | list(), list() | none()) ::
+          {:ok, list()} | {:error, map()}
+  def send("email", subject, %{html: _} = body, to, opts \\ []) do
+    opts =
+      if is_nil(opts[:from]), do: opts ++ [{:from, Helpers.sender_email_address()}], else: opts
+
+    body = build_channels("email", subject, body, to, opts)
 
     send(%{channels: body})
   end
